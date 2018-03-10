@@ -1,0 +1,89 @@
+from random import uniform, seed
+from math import sqrt
+import matplotlib.pyplot as plt
+
+##### Main #####
+
+num = 250 # liczba agentów danego typu
+numNeighbors = 12 # Liczba agentów postrzeganych jako sąsiedzi
+requireSameType = 8 # wymagana minimalna liczba sąsiadów tego samego typu
+seed(10) # Inicjalizuje podstawowy generator liczb losowych.
+
+class StudentAgent:
+    def __init__(self, type):
+#Agenci różnego typu mają różne kolory
+        self.type = type
+        self.show_position()
+
+    def show_position(self):
+# Lokalizacja agenta zmienia się na rozkładzie jedostajnym
+        self.position = uniform(0, 1), uniform(0, 1)
+
+    def get_distance(self, other):
+# Zwraca odległość między agentami na płaszczyźnie
+        a = (self.position[0] - other.position[0])**2
+        b = (self.position[1] - other.position[1])**2
+        return sqrt(a + b)
+
+    def happy(self, agents):
+# TRUE jeśli wymagana liczba sąsiadów jest taka sam
+        distances = []
+        for agent in agents:
+            if self != agent:
+                distance = self.get_distance(agent)
+                distances.append((distance, agent))
+        distances.sort()
+        neighbors = [agent for d, agent in distances[:numNeighbors]]
+        numSameType = sum(self.type == agent.type for agent in neighbors)
+        return numSameType >= requireSameType
+
+    def update(self, agents):
+# Jeśli nieszczęśliwy to losowo wybiera pozycje dopóki będzie szczęśliwy
+         while not self.happy(agents):
+             self.show_position()
+
+def plot_distribution(agents, cycle_num):
+    x1,y1 = [],[]
+    x2,y2 = [],[]
+    x3,y3 = [],[]
+
+    for agent in agents:
+        x, y = agent.position
+        if agent.type == 0:
+            x1.append(x)
+            y1.append(y)
+        elif agent.type == 1:
+            x2.append(x)
+            y2.append(y)
+        else:
+            x3.append(x)
+            y3.append(y)
+
+    fig, ax = plt.subplots(figsize=(10,10))
+    plot_args = {'markersize' : 11, 'alpha' : 0.65, 'markersize': 14}
+    ax.set_facecolor('#ffffff')
+    ax.plot(x1, y1, 'o', markerfacecolor='#0099ff', **plot_args)
+    ax.plot(x2, y2, '^', markerfacecolor='#00ff00', **plot_args)
+    ax.plot(x3, y3, 's', markerfacecolor='#ff0000', **plot_args)
+    ax.set_title('Iteration {}'.format(cycle_num))
+    plt.show()
+
+
+agents = [StudentAgent(0) for i in range(num)]
+agents.extend(StudentAgent(1) for i in range(num))
+agents.extend(StudentAgent(2) for i in range(num))
+count = 1
+terminate=False
+
+while terminate == False:
+    plot_distribution(agents, count)
+    count += 1
+    no_one_moved = True
+
+    for agent in agents:
+        old_position = agent.position
+        agent.update(agents)
+        if agent.position != old_position:
+            no_one_moved = False
+        if no_one_moved:
+            terminate = True

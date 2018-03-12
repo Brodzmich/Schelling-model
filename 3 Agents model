@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 ##### Main #####
 
 num = 250 # liczba agentów danego typu
-numNeighbors = 12 # Liczba agentów postrzeganych jako sąsiedzi
-requireSameType = 8 # wymagana minimalna liczba sąsiadów tego samego typu
-seed(10) # Inicjalizuje podstawowy generator liczb losowych.
+num_neighbors = 12   # Liczba agentów postrzeganych jako sąsiedzi
+require_same_type = 8 # Wymagana minimalna liczba sąsiadów tego samego typu
+seed(10)            # Inicjalizuje podstawowy generator liczb losowych.
 
-class StudentAgent:
+class Agent:
     def __init__(self, type):
 #Agenci różnego typu mają różne kolory
         self.type = type
@@ -33,9 +33,9 @@ class StudentAgent:
                 distance = self.get_distance(agent)
                 distances.append((distance, agent))
         distances.sort()
-        neighbors = [agent for d, agent in distances[:numNeighbors]]
-        numSameType = sum(self.type == agent.type for agent in neighbors)
-        return numSameType >= requireSameType
+        neighbors = [agent for d, agent in distances[:num_neighbors]]
+        num_same_type = sum(self.type == agent.type for agent in neighbors)
+        return num_same_type >= require_same_type
 
     def update(self, agents):
 # Jeśli nieszczęśliwy to losowo wybiera pozycje dopóki będzie szczęśliwy
@@ -69,9 +69,9 @@ def plot_distribution(agents, cycle_num):
     plt.show()
 
 
-agents = [StudentAgent(0) for i in range(num)]
-agents.extend(StudentAgent(1) for i in range(num))
-agents.extend(StudentAgent(2) for i in range(num))
+agents = [Agent(0) for i in range(num)]
+agents.extend(Agent(1) for i in range(num))
+agents.extend(Agent(2) for i in range(num))
 count = 1
 terminate=False
 
